@@ -57,6 +57,7 @@ async function run() {
 
     const db = client.db("plantNet_collection");
     const userCollection = db.collection("users");
+    const plantsCollection = db.collection("plants")
 
     // Generate jwt token
     app.post('/jwt', async (req, res) => {
@@ -109,8 +110,24 @@ async function run() {
       });
 
       res.send(result);
-    })
+    });
 
+
+    // save a plant data in db
+    app.post("/plants", verifyToken,  async (req, res) => {
+      const result = await plantsCollection.find().toArray();
+
+      res.send(result);
+    });
+
+
+    // get all plants data
+    app.get("/plants", async (req, res) => {
+      const plant = req.body;
+      const result = await plantsCollection.findOne(plant);
+
+      res.send(result);
+    });
 
     await client.db('admin').command({ ping: 1 })
     console.log(
