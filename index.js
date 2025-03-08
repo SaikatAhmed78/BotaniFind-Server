@@ -115,7 +115,8 @@ async function run() {
 
     // save a plant data in db
     app.post("/plants", verifyToken,  async (req, res) => {
-      const result = await plantsCollection.find().toArray();
+      const plant = req.body;
+      const result = await plantsCollection.insertOne(plant)
 
       res.send(result);
     });
@@ -123,11 +124,19 @@ async function run() {
 
     // get all plants data
     app.get("/plants", async (req, res) => {
-      const plant = req.body;
-      const result = await plantsCollection.findOne(plant);
+      const result = await plantsCollection.find().limit(200).toArray();
 
       res.send(result);
     });
+    
+    // get a plant by id
+    app.get('/plants/:id', async(req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const result = await plantsCollection.findOne(query);
+
+      res.send(result)
+    })
 
     await client.db('admin').command({ ping: 1 })
     console.log(
